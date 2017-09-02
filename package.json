@@ -6,6 +6,7 @@
   "scripts": {
     "build": "cross-env DEBUG=registry,metalsmith* babel-node lib/build",
     "scrape": "cross-env DEBUG=registry babel-node lib/scrape",
+    "scrape:dev": "cross-env DEBUG=registry,no-progress babel-node lib/scrape",
     "serve": "cross-env DEBUG=registry babel-node lib/serve"
   },
   "publishConfig": {

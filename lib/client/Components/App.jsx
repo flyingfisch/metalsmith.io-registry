@@ -67,8 +67,8 @@ export default class App extends React.Component {
           <div id='sort' className='col-xs-6'>
             <div className="btn-group">
               <button className="btn btn-default" onClick={this.onSortStars}>Stars</button>
-              <button className="btn btn-default" disabled onClick={this.onSortIssues}>Issues</button>
-              <button className="btn btn-default" disabled onClick={this.onSortDownloads}>Downloads</button>
+              <button className="btn btn-default" onClick={this.onSortIssues}>Issues</button>
+              <button className="btn btn-default" onClick={this.onSortDownloads}>Downloads</button>
             </div>
           </div>
         </div>
