@@ -1,0 +1,790 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>scrape.js</title>
+  <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+  <link rel="stylesheet" media="all" href="doc-style.css" />
+  <script src="doc-filelist.js"></script>
+  <script>
+    var relativeDir = "";
+    var thisFile = "home/levi/node/metalsmith.io-registry//scrape.js";
+    var defaultSidebar = true;
+  </script>
+  <script src="doc-script.js"></script>
+
+</head>
+<body>
+  <div id="sidebar_wrapper">
+    <div id="sidebar_switch">
+      <span class="tree">Files</span>
+      <span class="headings">Headings</span>
+    </div>
+    <div id="tree"></div>
+    <div id="headings">
+
+    </div>
+  </div>
+  <div id="sidebar-toggle"></div>
+  <div id="container">
+    <div class="background highlight"></div>
+<table cellpadding="0" cellspacing="0">
+  <tbody>
+    
+      <tr>
+        <td class="docs">
+          <h1>scrape.js</h1>
+        </td>
+        <td class="code highlight"></td>
+      </tr>
+    
+    
+      <tr>
+        <td class="docs">
+          <div class="pilwrap">
+  <a class="pilcrow" href="#section-1" id="section-1"></a>
+</div>
+
+        </td>
+        <td class="code highlight">
+          <pre class="javascript"><span class="hljs-keyword">import</span> flashheart <span class="hljs-keyword">from</span> <span class="hljs-string">'flashheart'</span>
+<span class="hljs-keyword">import</span> vow <span class="hljs-keyword">from</span> <span class="hljs-string">'vow'</span>
+<span class="hljs-keyword">import</span> debug <span class="hljs-keyword">from</span> <span class="hljs-string">'debug'</span>
+<span class="hljs-keyword">import</span> config <span class="hljs-keyword">from</span> <span class="hljs-string">'config'</span>
+<span class="hljs-keyword">import</span> streamToWorker <span class="hljs-keyword">from</span> <span class="hljs-string">'./streamToWorker'</span>
+<span class="hljs-keyword">import</span> {
+  writeFileSync <span class="hljs-keyword">as</span> write
+} <span class="hljs-keyword">from</span> <span class="hljs-string">'fs'</span>
+<span class="hljs-keyword">import</span> ProgressBar <span class="hljs-keyword">from</span> <span class="hljs-string">'progress'</span>
+
+<span class="hljs-keyword">const</span> OUTPUT_PATH = <span class="hljs-string">'pluginRegistry.json'</span>
+
+<span class="hljs-keyword">const</span> dbg = debug(<span class="hljs-string">'metalsmith-registry'</span>)
+
+</pre>
+        </td>
+      </tr>
+    
+      <tr>
+        <td class="docs">
+          <div class="pilwrap">
+  <a class="pilcrow" href="#section-2" id="section-2"></a>
+</div>
+<p>initialise disabled progress</p>
+
+        </td>
+        <td class="code highlight">
+          <pre class="javascript"><span class="hljs-keyword">let</span> progress = getProgress()
+
+</pre>
+        </td>
+      </tr>
+    
+      <tr>
+        <td class="docs">
+          <div class="pilwrap">
+  <a class="pilcrow" href="#section-3" id="section-3"></a>
+</div>
+<p>create output structure</p>
+
+        </td>
+        <td class="code highlight">
+          <pre class="javascript"><span class="hljs-keyword">const</span> output = {
+  <span class="hljs-attr">packages</span>: [],
+  <span class="hljs-attr">keywords</span>: {}
+}
+
+</pre>
+        </td>
+      </tr>
+    
+      <tr>
+        <td class="docs">
+          <div class="pilwrap">
+  <a class="pilcrow" href="#section-4" id="section-4"></a>
+</div>
+<p>create clients</p>
+
+        </td>
+        <td class="code highlight">
+          <pre class="javascript"><span class="hljs-keyword">const</span> npmjsClient = getNpmjsClient()
+<span class="hljs-keyword">const</span> githubClient = getGithubClient()
+
+</pre>
+        </td>
+      </tr>
+    
+      <tr>
+        <td class="docs">
+          <div class="pilwrap">
+  <a class="pilcrow" href="#section-5" id="section-5"></a>
+</div>
+<p><a href="./streamToWorker.js.html.html">streamToWorker</a> supervises iteration</p>
+
+        </td>
+        <td class="code highlight">
+          <pre class="javascript">streamToWorker({
+  fetch,
+  worker,
+  <span class="hljs-attr">concurrency</span>: <span class="hljs-number">10</span>,
+  <span class="hljs-attr">highWaterMark</span>: <span class="hljs-number">30</span>
+})
+.then(<span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> {
+  writeJson()
+  dbg(<span class="hljs-string">'scrape complete'</span>)
+})
+.catch(<span class="hljs-function">(<span class="hljs-params">err</span>) =&gt;</span> dbg(err))
+
+</pre>
+        </td>
+      </tr>
+    
+      <tr>
+        <td class="docs">
+          <div class="pilwrap">
+  <a class="pilcrow" href="#section-6" id="section-6"></a>
+</div>
+<div class="dox">
+<div class="summary">
+<p>fetch
+get items from npmjs search endpoint</p>
+</div>
+<div class="body">
+</div>
+<div class="details">
+<div class="dox_tag_title">Params</div>
+<div class="dox_tag_detail">
+<span class="dox_tag_name">retrieved</span>
+<span class="dox_type">Number</span>
+<span><ul>
+<li>items retrieved thus far</li>
+</ul>
+</span>
+</div>
+<div class="dox_tag_detail">
+<span class="dox_tag_name">callback</span>
+<span class="dox_type">Function</span>
+<span><ul>
+<li>return retrieved items</li>
+</ul>
+</span>
+</div>
+</div>
+</div>
+
+        </td>
+        <td class="code highlight">
+          <pre class="javascript"><span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">fetch</span> (<span class="hljs-params">retrieved, callback</span>) </span>{
+  npmjsClient.get(
+    <span class="hljs-string">'https://registry.npmjs.org/-/v1/search'</span>,
+    {<span class="hljs-attr">qs</span>: {<span class="hljs-attr">text</span>: <span class="hljs-string">'metalsmith-'</span>, <span class="hljs-attr">from</span>: retrieved}},
+    (err, res) =&gt; {
+      <span class="hljs-keyword">if</span> (err) <span class="hljs-keyword">throw</span> err
+      <span class="hljs-keyword">let</span> npmjs = res.objects.map(<span class="hljs-function">(<span class="hljs-params">resObject</span>) =&gt;</span> resObject.package)
+</pre>
+        </td>
+      </tr>
+    
+      <tr>
+        <td class="docs">
+          <div class="pilwrap">
+  <a class="pilcrow" href="#section-7" id="section-7"></a>
+</div>
+<p>instantiate progress bar now we know the total packages</p>
+
+        </td>
+        <td class="code highlight">
+          <pre class="javascript">      <span class="hljs-keyword">if</span> (retrieved === <span class="hljs-number">0</span> &amp;&amp; !<span class="hljs-regexp">/no-progress/</span>.exec(process.env.DEBUG)) {
+        progress = getProgress(res.total)
+      }
+</pre>
+        </td>
+      </tr>
+    
+      <tr>
+        <td class="docs">
+          <div class="pilwrap">
+  <a class="pilcrow" href="#section-8" id="section-8"></a>
+</div>
+<p>check whether that was the last request</p>
+
+        </td>
+        <td class="code highlight">
+          <pre class="javascript">      <span class="hljs-keyword">if</span> (retrieved + res.objects.length &gt;= res.total) npmjs.push(<span class="hljs-literal">null</span>)
+      callback(<span class="hljs-literal">null</span>, npmjs)
+    }
+  )
+}
+
+</pre>
+        </td>
+      </tr>
+    
+      <tr>
+        <td class="docs">
+          <div class="pilwrap">
+  <a class="pilcrow" href="#section-9" id="section-9"></a>
+</div>
+<div class="dox">
+<div class="summary">
+<p>worker
+called for each result from npmjs search
+each function:</p>
+<ul>
+<li>in the queue receives meta as a single param.</li>
+<li>must return a promise, but that promise does not need to resolve to meta</li>
+<li>can reject it's returned promise to discontinue processing that item</li>
+</ul>
+</div>
+<div class="body">
+</div>
+<div class="details">
+<div class="dox_tag_title">Params</div>
+<div class="dox_tag_detail">
+<span class="dox_tag_name">npmjs</span>
+<span class="dox_type">Object</span>
+<span><ul>
+<li>one result from npmjs search</li>
+</ul>
+</span>
+</div>
+<div class="dox_tag_detail">
+<span class="dox_tag_name">retry</span>
+<span class="dox_type">Function</span>
+<span><ul>
+<li>pass an item to retry to restart the process</li>
+</ul>
+</span>
+</div>
+<div class="dox_tag_title">Returns</div>
+<div class="dox_tag_detail">
+<span class="dox_tag_name"></span>
+<span class="dox_type">Promise</span>
+</div>
+</div>
+</div>
+
+        </td>
+        <td class="code highlight">
+          <pre class="javascript"><span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">worker</span> (<span class="hljs-params">npmjs, retry</span>) </span>{
+  <span class="hljs-keyword">let</span> meta = {
+    npmjs,
+    <span class="hljs-attr">github</span>: {}
+  }
+  <span class="hljs-keyword">return</span> vow.resolve()
+  .then(<span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> filter(meta))
+  .then(<span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> getDownloads(meta))
+  .then(<span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> getGithub(meta))
+  .then(<span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> getIssues(meta))
+  .then(<span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> parse(meta))
+  .catch(<span class="hljs-function">(<span class="hljs-params">err</span>) =&gt;</span> {
+    progress.interrupt(err.toString ? err.toString() : err)
+  })
+  .then(<span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> {
+    progress.tick({ <span class="hljs-attr">name</span>: meta.npmjs.name })
+  })
+  .catch(dbg)
+}
+
+</pre>
+        </td>
+      </tr>
+    
+      <tr>
+        <td class="docs">
+          <div class="pilwrap">
+  <a class="pilcrow" href="#section-10" id="section-10"></a>
+</div>
+<div class="dox">
+<div class="summary">
+<p>filter
+exclude results from npmjs</p>
+</div>
+<div class="body">
+</div>
+<div class="details">
+<div class="dox_tag_title">Params</div>
+<div class="dox_tag_detail">
+<span class="dox_tag_name">meta</span>
+<span class="dox_type">object</span>
+<span><ul>
+<li>see worer</li>
+</ul>
+</span>
+</div>
+<div class="dox_tag_title">Returns</div>
+<div class="dox_tag_detail">
+<span class="dox_tag_name"></span>
+<span class="dox_type">Promise</span>
+</div>
+</div>
+</div>
+
+        </td>
+        <td class="code highlight">
+          <pre class="javascript"><span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">filter</span> (<span class="hljs-params">meta</span>) </span>{
+  <span class="hljs-keyword">if</span> (<span class="hljs-regexp">/^(@[a-zA-Z]+\/)?metalsmith-/</span>.exec(meta.npmjs.name)) <span class="hljs-keyword">return</span>
+  <span class="hljs-keyword">return</span> vow.reject(<span class="hljs-string">`ignoring <span class="hljs-subst">${meta.npmjs.name}</span>`</span>)
+}
+
+</pre>
+        </td>
+      </tr>
+    
+      <tr>
+        <td class="docs">
+          <div class="pilwrap">
+  <a class="pilcrow" href="#section-11" id="section-11"></a>
+</div>
+<div class="dox">
+<div class="summary">
+<p>getNpmjs
+the search endpoint returns a subset of package meta. This endpoint returns
+all available meta. This additional data isn't used at this time.</p>
+</div>
+<div class="body">
+</div>
+<div class="details">
+<div class="dox_tag_title">Params</div>
+<div class="dox_tag_detail">
+<span class="dox_tag_name">meta</span>
+<span class="dox_type">object</span>
+<span><ul>
+<li>see worer</li>
+</ul>
+</span>
+</div>
+<div class="dox_tag_title">Returns</div>
+<div class="dox_tag_detail">
+<span class="dox_tag_name"></span>
+<span class="dox_type">Promise</span>
+</div>
+</div>
+</div>
+
+        </td>
+        <td class="code highlight">
+          <pre class="javascript"><span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">getNpmjs</span> (<span class="hljs-params">meta</span>) </span>{
+  <span class="hljs-keyword">let</span> defer = vow.defer()
+  npmjsClient.get(
+    <span class="hljs-string">`https://registry.npmjs.org/<span class="hljs-subst">${meta.npmjs.name}</span>`</span>,
+    (err, res) =&gt; {
+      dbg(err)
+      dbg(res)
+      defer.resolve()
+    }
+  )
+  <span class="hljs-keyword">return</span> defer.promise()
+}
+
+</pre>
+        </td>
+      </tr>
+    
+      <tr>
+        <td class="docs">
+          <div class="pilwrap">
+  <a class="pilcrow" href="#section-12" id="section-12"></a>
+</div>
+<div class="dox">
+<div class="summary">
+<p>getDownloads
+npmjs downloads need to be retrieved from the <code>downloads</code> endpoint
+this just retrieves downloads during the last month</p>
+</div>
+<div class="body">
+</div>
+<div class="details">
+<div class="dox_tag_title">Params</div>
+<div class="dox_tag_detail">
+<span class="dox_tag_name">meta</span>
+<span class="dox_type">object</span>
+<span><ul>
+<li>see worer</li>
+</ul>
+</span>
+</div>
+<div class="dox_tag_title">Returns</div>
+<div class="dox_tag_detail">
+<span class="dox_tag_name"></span>
+<span class="dox_type">Promise</span>
+</div>
+</div>
+</div>
+
+        </td>
+        <td class="code highlight">
+          <pre class="javascript"><span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">getDownloads</span> (<span class="hljs-params">meta</span>) </span>{
+  <span class="hljs-keyword">let</span> defer = vow.defer()
+  npmjsClient.get(
+    <span class="hljs-string">`https://api.npmjs.org/downloads/point/last-month/<span class="hljs-subst">${meta.npmjs.name}</span>`</span>,
+    (err, res) =&gt; {
+      <span class="hljs-keyword">if</span> (err) <span class="hljs-keyword">return</span> defer.reject(err)
+      meta.npmjs.downloads = res.downloads
+      defer.resolve()
+    }
+  )
+  <span class="hljs-keyword">return</span> defer.promise()
+}
+
+</pre>
+        </td>
+      </tr>
+    
+      <tr>
+        <td class="docs">
+          <div class="pilwrap">
+  <a class="pilcrow" href="#section-13" id="section-13"></a>
+</div>
+<div class="dox">
+<div class="summary">
+<p>getGithub
+retrieve package meta from github see structure here:
+https://developer.github.com/v3/repos/#get
+response doesn't include loads of information, but includes a lot of urls
+with with which to retrieve additional meta. See <code>getIssues</code></p>
+</div>
+<div class="body">
+</div>
+<div class="details">
+<div class="dox_tag_title">Params</div>
+<div class="dox_tag_detail">
+<span class="dox_tag_name">meta</span>
+<span class="dox_type">object</span>
+<span><ul>
+<li>see worer</li>
+</ul>
+</span>
+</div>
+<div class="dox_tag_title">Returns</div>
+<div class="dox_tag_detail">
+<span class="dox_tag_name"></span>
+<span class="dox_type">Promise</span>
+</div>
+</div>
+</div>
+
+        </td>
+        <td class="code highlight">
+          <pre class="javascript"><span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">getGithub</span> (<span class="hljs-params">meta</span>) </span>{
+  <span class="hljs-keyword">const</span> repo = <span class="hljs-regexp">/[^/]*\/[^/]*$/</span>.exec(meta.npmjs.links.repository)
+  <span class="hljs-keyword">if</span> (!repo) <span class="hljs-keyword">return</span> vow.reject(<span class="hljs-string">`<span class="hljs-subst">${meta.npmjs.name}</span>: has no repo link`</span>)
+  <span class="hljs-keyword">let</span> defer = vow.defer()
+  githubClient.get(
+    <span class="hljs-string">`https://api.github.com/repos/<span class="hljs-subst">${repo[<span class="hljs-number">0</span>]}</span>`</span>,
+    (err, res) =&gt; {
+      <span class="hljs-keyword">if</span> (err &amp;&amp; err.statusCode === <span class="hljs-number">404</span>) {
+        <span class="hljs-keyword">return</span> defer.reject(<span class="hljs-string">`<span class="hljs-subst">${meta.npmjs.name}</span>: has bad repo link`</span>)
+      }
+      <span class="hljs-keyword">if</span> (err) {
+        <span class="hljs-keyword">return</span> defer.reject(err)
+      }
+      meta.github = res
+      defer.resolve()
+    }
+  )
+  <span class="hljs-keyword">return</span> defer.promise()
+}
+
+</pre>
+        </td>
+      </tr>
+    
+      <tr>
+        <td class="docs">
+          <div class="pilwrap">
+  <a class="pilcrow" href="#section-14" id="section-14"></a>
+</div>
+<div class="dox">
+<div class="summary">
+<p>getIssues
+retrieve number of issues</p>
+</div>
+<div class="body">
+</div>
+<div class="details">
+<div class="dox_tag_title">Params</div>
+<div class="dox_tag_detail">
+<span class="dox_tag_name">meta</span>
+<span class="dox_type">object</span>
+<span><ul>
+<li>see worer</li>
+</ul>
+</span>
+</div>
+<div class="dox_tag_title">Returns</div>
+<div class="dox_tag_detail">
+<span class="dox_tag_name"></span>
+<span class="dox_type">Promise</span>
+</div>
+</div>
+</div>
+
+        </td>
+        <td class="code highlight">
+          <pre class="javascript"><span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">getIssues</span> (<span class="hljs-params">meta</span>) </span>{
+  <span class="hljs-keyword">let</span> defer = vow.defer()
+  <span class="hljs-keyword">let</span> url = meta.github.issues_url.replace(<span class="hljs-regexp">/\{.*\}/</span>, <span class="hljs-string">''</span>)
+  githubClient.get(
+    url,
+    (err, res) =&gt; {
+      <span class="hljs-keyword">if</span> (err) <span class="hljs-keyword">return</span> defer.reject(err)
+      meta.github.issues_count = res.length
+      defer.resolve()
+    }
+  )
+  <span class="hljs-keyword">return</span> defer.promise()
+}
+
+</pre>
+        </td>
+      </tr>
+    
+      <tr>
+        <td class="docs">
+          <div class="pilwrap">
+  <a class="pilcrow" href="#section-15" id="section-15"></a>
+</div>
+<div class="dox">
+<div class="summary">
+<p>parse
+construct object to be output, exclude all the information not required
+by the client</p>
+</div>
+<div class="body">
+</div>
+<div class="details">
+<div class="dox_tag_title">Params</div>
+<div class="dox_tag_detail">
+<span class="dox_tag_name">meta</span>
+<span class="dox_type">object</span>
+<span><ul>
+<li>see worer</li>
+</ul>
+</span>
+</div>
+<div class="dox_tag_title">Returns</div>
+<div class="dox_tag_detail">
+<span class="dox_tag_name"></span>
+<span class="dox_type">Promise</span>
+</div>
+</div>
+</div>
+
+        </td>
+        <td class="code highlight">
+          <pre class="javascript"><span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">parse</span> (<span class="hljs-params">meta</span>) </span>{
+</pre>
+        </td>
+      </tr>
+    
+      <tr>
+        <td class="docs">
+          <div class="pilwrap">
+  <a class="pilcrow" href="#section-16" id="section-16"></a>
+</div>
+<p>dbg(meta)</p>
+
+        </td>
+        <td class="code highlight">
+          <pre class="javascript">  <span class="hljs-keyword">const</span> kws = output.keywords
+  <span class="hljs-keyword">const</span> pkgs = output.packages
+  <span class="hljs-keyword">let</span> pkg = {
+    <span class="hljs-attr">name</span>: meta.npmjs.name,
+    <span class="hljs-attr">keywords</span>: meta.npmjs.keywords,
+    <span class="hljs-attr">description</span>: meta.npmjs.description,
+    <span class="hljs-attr">stars</span>: meta.github.stargazers_count,
+    <span class="hljs-attr">issues</span>: meta.github.issues_count,
+    <span class="hljs-attr">downloads</span>: meta.npmjs.downloads
+  }
+  pkgs.push(pkg)
+  <span class="hljs-keyword">if</span> (!pkg.keywords) <span class="hljs-keyword">return</span>
+  pkg.keywords.forEach(<span class="hljs-function">(<span class="hljs-params">kw</span>) =&gt;</span> {
+    kws[kw] = kws[kw] === <span class="hljs-literal">undefined</span> ? <span class="hljs-number">1</span> : kws[kw] + <span class="hljs-number">1</span>
+  })
+  <span class="hljs-keyword">return</span> pkg
+}
+
+</pre>
+        </td>
+      </tr>
+    
+      <tr>
+        <td class="docs">
+          <div class="pilwrap">
+  <a class="pilcrow" href="#section-17" id="section-17"></a>
+</div>
+<div class="dox">
+<div class="summary">
+<p>writeJson
+write collated meta to JSON</p>
+</div>
+<div class="body">
+</div>
+</div>
+
+        </td>
+        <td class="code highlight">
+          <pre class="javascript"><span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">writeJson</span> (<span class="hljs-params"></span>) </span>{
+  write(OUTPUT_PATH, <span class="hljs-built_in">JSON</span>.stringify(output))
+  dbg(<span class="hljs-string">'scrape complete'</span>)
+}
+
+</pre>
+        </td>
+      </tr>
+    
+      <tr>
+        <td class="docs">
+          <div class="pilwrap">
+  <a class="pilcrow" href="#section-18" id="section-18"></a>
+</div>
+<div class="dox">
+<div class="summary">
+<p>getProgress
+make progress bar, or disabled noop thing</p>
+</div>
+<div class="body">
+</div>
+<div class="details">
+<div class="dox_tag_title">Params</div>
+<div class="dox_tag_detail">
+<span class="dox_tag_name">total</span>
+<span class="dox_type">Number</span>
+<span><ul>
+<li>total items</li>
+</ul>
+</span>
+</div>
+<div class="dox_tag_title">Returns</div>
+<div class="dox_tag_detail">
+<span class="dox_tag_name"></span>
+<span class="dox_type">Object</span>
+<span class="dox_type">ProgressBar</span>
+</div>
+</div>
+</div>
+
+        </td>
+        <td class="code highlight">
+          <pre class="javascript"><span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">getProgress</span> (<span class="hljs-params">total</span>) </span>{
+  <span class="hljs-keyword">if</span> (!total) {
+</pre>
+        </td>
+      </tr>
+    
+      <tr>
+        <td class="docs">
+          <div class="pilwrap">
+  <a class="pilcrow" href="#section-19" id="section-19"></a>
+</div>
+<p>initialise disabled progress bar</p>
+
+        </td>
+        <td class="code highlight">
+          <pre class="javascript">    <span class="hljs-keyword">return</span> {
+      <span class="hljs-attr">tick</span>: <span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> {},
+      <span class="hljs-attr">interrupt</span>: <span class="hljs-function">(<span class="hljs-params">...args</span>) =&gt;</span> dbg(...args)
+    }
+  }
+  <span class="hljs-keyword">return</span> <span class="hljs-keyword">new</span> ProgressBar(
+    <span class="hljs-string">'[:bar] :current/:total (:elapsed/:eta) :name'</span>,
+    {
+      <span class="hljs-attr">incomplete</span>: <span class="hljs-string">' '</span>,
+      total,
+      <span class="hljs-attr">width</span>: <span class="hljs-number">50</span>
+    }
+  )
+}
+
+</pre>
+        </td>
+      </tr>
+    
+      <tr>
+        <td class="docs">
+          <div class="pilwrap">
+  <a class="pilcrow" href="#section-20" id="section-20"></a>
+</div>
+<div class="dox">
+<div class="summary">
+<p>getNpmjsClient
+create client for npmjs</p>
+</div>
+<div class="body">
+</div>
+<div class="details">
+<div class="dox_tag_title">Returns</div>
+<div class="dox_tag_detail">
+<span class="dox_tag_name"></span>
+<span class="dox_type">Request</span>
+</div>
+</div>
+</div>
+
+        </td>
+        <td class="code highlight">
+          <pre class="javascript"><span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">getNpmjsClient</span> (<span class="hljs-params"></span>) </span>{
+  <span class="hljs-keyword">return</span> flashheart.createClient({
+    <span class="hljs-attr">retries</span>: <span class="hljs-number">5</span>,
+    <span class="hljs-attr">retryTimeout</span>: <span class="hljs-number">250</span>,
+    <span class="hljs-attr">timeout</span>: <span class="hljs-number">5000</span>
+  })
+}
+
+</pre>
+        </td>
+      </tr>
+    
+      <tr>
+        <td class="docs">
+          <div class="pilwrap">
+  <a class="pilcrow" href="#section-21" id="section-21"></a>
+</div>
+<div class="dox">
+<div class="summary">
+<p>getGithubClient
+create client for github
+configure auth for either token or user &amp; pass.
+see <code>config/default.js</code></p>
+</div>
+<div class="body">
+</div>
+<div class="details">
+<div class="dox_tag_title">Returns</div>
+<div class="dox_tag_detail">
+<span class="dox_tag_name"></span>
+<span class="dox_type">Request</span>
+</div>
+</div>
+</div>
+
+        </td>
+        <td class="code highlight">
+          <pre class="javascript"><span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">getGithubClient</span> (<span class="hljs-params"></span>) </span>{
+  <span class="hljs-keyword">const</span> githubAuth = config.get(<span class="hljs-string">'github-auth'</span>)
+  <span class="hljs-keyword">const</span> githubDefaults = {}
+  <span class="hljs-keyword">if</span> (githubAuth.token) {
+    githubDefaults.headers = {<span class="hljs-attr">Authorization</span>: <span class="hljs-string">`token <span class="hljs-subst">${githubAuth.token}</span>`</span>}
+  } <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (githubAuth.username) {
+    githubDefaults.auth = githubAuth
+  } <span class="hljs-keyword">else</span> {
+    <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> <span class="hljs-built_in">Error</span>(<span class="hljs-string">'fix your github auth config'</span>)
+  }
+  <span class="hljs-keyword">return</span> flashheart.createClient({
+    <span class="hljs-attr">retries</span>: <span class="hljs-number">5</span>,
+    <span class="hljs-attr">retryTimeout</span>: <span class="hljs-number">250</span>,
+    <span class="hljs-attr">timeout</span>: <span class="hljs-number">5000</span>,
+    <span class="hljs-attr">defaults</span>: githubDefaults
+  })
+}
+
+</pre>
+        </td>
+      </tr>
+    
+  </tbody>
+</table>
+
+  </div>
+</body>
+</html>

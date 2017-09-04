@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>App.jsx</title>
+  <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+  <link rel="stylesheet" media="all" href="../../doc-style.css" />
+  <script src="../../doc-filelist.js"></script>
+  <script>
+    var relativeDir = "../../";
+    var thisFile = "home/levi/node/metalsmith.io-registry//client/Components/App.jsx";
+    var defaultSidebar = true;
+  </script>
+  <script src="../../doc-script.js"></script>
+
+</head>
+<body>
+  <div id="sidebar_wrapper">
+    <div id="sidebar_switch">
+      <span class="tree">Files</span>
+      <span class="headings">Headings</span>
+    </div>
+    <div id="tree"></div>
+    <div id="headings">
+
+    </div>
+  </div>
+  <div id="sidebar-toggle"></div>
+  <div id="container">
+    <div class="background highlight"></div>
+<table cellpadding="0" cellspacing="0">
+  <tbody>
+    
+      <tr>
+        <td class="docs">
+          <h1>App.jsx</h1>
+        </td>
+        <td class="code highlight"></td>
+      </tr>
+    
+    
+      <tr>
+        <td class="docs">
+          <div class="pilwrap">
+  <a class="pilcrow" href="#section-1" id="section-1"></a>
+</div>
+
+        </td>
+        <td class="code highlight">
+          <pre class="javascript"><span class="hljs-keyword">import</span> React <span class="hljs-keyword">from</span> <span class="hljs-string">'react'</span>
+<span class="hljs-keyword">import</span> PropTypes <span class="hljs-keyword">from</span> <span class="hljs-string">'prop-types'</span>
+<span class="hljs-keyword">import</span> Package <span class="hljs-keyword">from</span> <span class="hljs-string">'./Package'</span>
+<span class="hljs-keyword">import</span> query <span class="hljs-keyword">from</span> <span class="hljs-string">'array-query'</span>
+<span class="hljs-keyword">import</span> update <span class="hljs-keyword">from</span> <span class="hljs-string">'immutability-helper'</span>
+
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">default</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">App</span> <span class="hljs-keyword">extends</span> <span class="hljs-title">React</span>.<span class="hljs-title">Component</span> </span>{
+  <span class="hljs-keyword">constructor</span> (props) {
+    <span class="hljs-keyword">super</span>(props)
+    <span class="hljs-keyword">this</span>.state = {
+      <span class="hljs-attr">sort</span>: <span class="hljs-string">'stars'</span>,
+      <span class="hljs-attr">sortDir</span>: <span class="hljs-string">'-1'</span>,
+      <span class="hljs-attr">filter</span>: <span class="hljs-string">''</span>,
+      <span class="hljs-attr">packages</span>: props.packages.slice(<span class="hljs-number">0</span>, <span class="hljs-number">20</span>)
+    }
+  }
+  onFilter = <span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> {
+    <span class="hljs-keyword">let</span> newState = update(<span class="hljs-keyword">this</span>.state, {<span class="hljs-attr">filter</span>: {<span class="hljs-attr">$set</span>: <span class="hljs-keyword">this</span>.filterInput.value}})
+    <span class="hljs-keyword">this</span>.query(newState)
+  }
+  onSortStars = <span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> {
+    <span class="hljs-keyword">let</span> newState
+    <span class="hljs-keyword">if</span> (<span class="hljs-keyword">this</span>.state.sort === <span class="hljs-string">'stars'</span>) {
+      newState = update(<span class="hljs-keyword">this</span>.state, {<span class="hljs-attr">sortDir</span>: {<span class="hljs-attr">$set</span>: <span class="hljs-keyword">this</span>.state.sortDir * <span class="hljs-number">-1</span>}})
+    } <span class="hljs-keyword">else</span> {
+      newState = update(<span class="hljs-keyword">this</span>.state, {<span class="hljs-attr">sort</span>: {<span class="hljs-attr">$set</span>: <span class="hljs-string">'stars'</span>}})
+    }
+    <span class="hljs-keyword">this</span>.query(newState)
+  }
+  onSortIssues = <span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> {
+    <span class="hljs-keyword">let</span> newState
+    <span class="hljs-keyword">if</span> (<span class="hljs-keyword">this</span>.state.sort === <span class="hljs-string">'issues'</span>) {
+      newState = update(<span class="hljs-keyword">this</span>.state, {<span class="hljs-attr">sortDir</span>: {<span class="hljs-attr">$set</span>: <span class="hljs-keyword">this</span>.state.sortDir * <span class="hljs-number">-1</span>}})
+    } <span class="hljs-keyword">else</span> {
+      newState = update(<span class="hljs-keyword">this</span>.state, {<span class="hljs-attr">sort</span>: {<span class="hljs-attr">$set</span>: <span class="hljs-string">'issues'</span>}})
+    }
+    <span class="hljs-keyword">this</span>.query(newState)
+  }
+  onSortDownloads = <span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> {
+    <span class="hljs-keyword">let</span> newState
+    <span class="hljs-keyword">if</span> (<span class="hljs-keyword">this</span>.state.sort === <span class="hljs-string">'downloads'</span>) {
+      newState = update(<span class="hljs-keyword">this</span>.state, {<span class="hljs-attr">sortDir</span>: {<span class="hljs-attr">$set</span>: <span class="hljs-keyword">this</span>.state.sortDir * <span class="hljs-number">-1</span>}})
+    } <span class="hljs-keyword">else</span> {
+      newState = update(<span class="hljs-keyword">this</span>.state, {<span class="hljs-attr">sort</span>: {<span class="hljs-attr">$set</span>: <span class="hljs-string">'downloads'</span>}})
+    }
+    <span class="hljs-keyword">this</span>.query(newState)
+  }
+  query (newState) {
+    <span class="hljs-keyword">let</span> packages = query(<span class="hljs-string">'name'</span>).search(newState.filter)
+    .or(<span class="hljs-string">'keywords'</span>).has(newState.filter)
+    .limit(<span class="hljs-number">20</span>)
+    .sort(newState.sort)[newState.sortDir === <span class="hljs-number">1</span> ? <span class="hljs-string">'asc'</span> : <span class="hljs-string">'desc'</span>]()
+    .on(<span class="hljs-keyword">this</span>.props.packages)
+    <span class="hljs-keyword">this</span>.setState(update(newState, {<span class="hljs-attr">packages</span>: {<span class="hljs-attr">$set</span>: packages}}))
+    <span class="hljs-built_in">console</span>.log(packages)
+  }
+  render () {
+    <span class="hljs-keyword">const</span> pkgs = <span class="hljs-keyword">this</span>.state.packages.map(<span class="hljs-function">(<span class="hljs-params">pkg</span>) =&gt;</span> {
+      <span class="hljs-keyword">return</span> &lt;Package key={pkg.name} pkg={pkg} /&gt;
+    }) || null
+    return (
+      &lt;div className="container"&gt;
+        &lt;div className="row margin-top"&gt;
+          &lt;div id='filter' className='col-xs-6'&gt;
+            &lt;input placeholder="filter" onChange={this.onFilter} ref={(el) =&gt; { this.filterInput = el }} /&gt;
+          &lt;/div&gt;
+          &lt;div id='sort' className='col-xs-6'&gt;
+            &lt;div className="btn-group"&gt;
+              &lt;button className="btn btn-default" onClick={this.onSortStars}&gt;Stars&lt;/button&gt;
+              &lt;button className="btn btn-default" onClick={this.onSortIssues}&gt;Issues&lt;/button&gt;
+              &lt;button className="btn btn-default" onClick={this.onSortDownloads}&gt;Downloads&lt;/button&gt;
+            &lt;/div&gt;
+          &lt;/div&gt;
+        &lt;/div&gt;
+        &lt;div className="row margin-top"&gt;
+          &lt;div className='col-xs-12'&gt;
+            {[pkgs]}
+          &lt;/div&gt;
+        &lt;/div&gt;
+      &lt;/div&gt;
+    )
+  }
+}
+
+App.propTypes = {
+  packages: PropTypes.array
+}
+
+</pre>
+        </td>
+      </tr>
+    
+  </tbody>
+</table>
+
+  </div>
+</body>
+</html>
