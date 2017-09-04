@@ -1,1 +1,1 @@
-var tree={"files":["build.js","scrape.js","serve.js","streamToWorker.js"],"dirs":{"client":{"files":["client.jsx","styles.less"],"dirs":{"Components":{"files":["App.jsx","Package.jsx"]}}}}};
+var tree={"files":["README.md","build.js","scrape.js","serve.js","streamToWorker.js"],"dirs":{"client":{"files":["client.jsx","styles.less"],"dirs":{"Components":{"files":["App.jsx","Package.jsx"]}}}}};

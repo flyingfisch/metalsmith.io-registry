@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>README.md</title>
+  <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+  <link rel="stylesheet" media="all" href="doc-style.css" />
+  <script src="doc-filelist.js"></script>
+  <script>
+    var relativeDir = "";
+    var thisFile = "home/levi/node/metalsmith.io-registry//README.md";
+    var defaultSidebar = true;
+  </script>
+  <script src="doc-script.js"></script>
+
+</head>
+<body>
+  <div id="sidebar_wrapper">
+    <div id="sidebar_switch">
+      <span class="tree">Files</span>
+      <span class="headings">Headings</span>
+    </div>
+    <div id="tree"></div>
+    <div id="headings">
+
+      <div class="heading h3">
+        <a href="#metalsmith.io-registry">metalsmith.io-registry</a>
+      </div>
+
+      <div class="heading h3">
+        <a href="#usage">usage</a>
+      </div>
+
+      <div class="heading h3">
+        <a href="#dev-notes">dev notes</a>
+      </div>
+
+    </div>
+  </div>
+  <div id="sidebar-toggle"></div>
+  <div id="container">
+    <div class="docs markdown"><div class="pilwrap" id="metalsmith.io-registry">
+  <h3>
+    <a href="#metalsmith.io-registry" name="metalsmith.io-registry" class="pilcrow"></a>
+metalsmith.io-registry
+  </h3>
+</div>
+<p>A quick proof of concept of how a plugin registry might work.</p>
+<div class="pilwrap" id="usage">
+  <h3>
+    <a href="#usage" name="usage" class="pilcrow"></a>
+usage
+  </h3>
+</div>
+<ul>
+<li>clone repo</li>
+<li>copy <code>config/default.js</code> to <code>config/local.js</code> and enter your credentials</li>
+<li><code>npm i</code></li>
+<li><code>npm run scrape</code> to collate package meta data</li>
+<li><code>npm run build</code> to build static client</li>
+<li><code>npm run serve</code> to run dev server</li>
+<li>direct your browser to http://localhost:8080</li>
+</ul>
+<div class="pilwrap" id="dev-notes">
+  <h3>
+    <a href="#dev-notes" name="dev-notes" class="pilcrow"></a>
+dev notes
+  </h3>
+</div>
+<p>For both the npmjs &amp; github apis it will be best to use a simple request client
+rather than their respective api abstraction packages. Our uses are relatively
+simple, and I ran into weird problems trying to trap errors with the published
+github api package.</p>
+<p>Npmjs api docs are really well hidden, this is the best I can find:
+https://github.com/npm/registry/blob/master/docs/</p>
+<p><code>npm run scrape:dev</code> disables the progress bar which is very helpful of you're
+debugging things to the console.</p>
+<p>The package meta data file is ~$100kb on disk, but gzip will compress this to
+about 20kb.</p>
+<p>The client js currently generated is currently ~850kb, but there's no crazy
+dependencies or whatever so this should come down to less than 200kb when
+built in production mode.. but I haven't tried it.</p>
+</div>
+  </div>
+</body>
+</html>
