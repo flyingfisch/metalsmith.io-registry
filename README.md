@@ -12,6 +12,12 @@ A quick proof of concept of how a plugin registry might work.
  * `npm run serve` to run dev server
  * direct your browser to http://localhost:8080
 
+### docs
+
+See [annotated source](https://leviwheatcroft.github.io/metalsmith.io-registry/)
+
+Generate docs with `npm run docs && npm run gh-pages`
+
 ### dev notes
 
 For both the npmjs & github apis it will be best to use a simple request client
